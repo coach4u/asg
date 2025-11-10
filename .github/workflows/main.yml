@@ -39,6 +39,7 @@ jobs:
         run: terraform init -backend-config="key=ec2/${{ github.event.inputs.environment }}/terraform.tfstate"
 
       - name: Terraform Plan
+        working-directory: terraform_asg
         if: ${{ github.event.inputs.action == 'plan' }}
         run: terraform plan -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
 
