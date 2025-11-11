@@ -5,11 +5,12 @@ module "ec2" {
   subnet_id         = var.subnet_id
   security_group_id = var.security_group_id
   key_name          = var.key_name
- # env = var.env
+  env = var.env
 }
 
 output "instance_id" {
   value = module.ec2.instance_id
 }
+
 
 
