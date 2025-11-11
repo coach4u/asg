@@ -7,6 +7,18 @@ on:
         description: 'Environment to deploy (e.g., dev, prod)'
         required: true
         default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+      action:
+        description: 'Select Terraform Action'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
 
 jobs:
   terraform:
@@ -37,10 +49,11 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
+        if: github.event.inputs.action == 'plan'
         working-directory: terraform_asg
         run: terraform plan -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
 
       - name: Terraform Apply
-        if: github.event.inputs.environment == 'dev'
+        if: github.event.inputs.action == 'apply'
         working-directory: terraform_asg
         run: terraform apply -auto-approve -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
