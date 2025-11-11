@@ -5,6 +5,6 @@ resource "aws_instance" "this" {
 
     tags = {
          Name="ec2-${var.env}"
-         Environment=var.env
+       #  Environment=var.env
     }
 }
