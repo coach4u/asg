@@ -4,7 +4,7 @@ resource "aws_instance" "this" {
     key_name=var.key_name
 
     tags = {
-         Name="ec2-${var.environment}"
-         Environment=var.environment
+         Name="ec2-${var.env}"
+         Environment=var.env
     }
 }
