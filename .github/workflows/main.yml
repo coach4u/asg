@@ -1,48 +1,40 @@
-name: Terraform EC2 Deployment
+name: Terraform
 
 on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Choose environment"
+        description: 'Environment to deploy (e.g., dev, prod)'
         required: true
-        type: choice
-        options:
-          - dev
-          - staging
-          - prod
-      action:
-        description: "Choose Terraform action"
-        required: true
-        type: choice
-        options:
-          - plan
-          - apply
+        default: 'dev'
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_REGION: us-east-1
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.9.0
+          terraform_version: 1.9.5  # or your version
 
       - name: Terraform Init
+        working-directory: terraform_asg
         run: terraform init -backend-config="key=ec2/${{ github.event.inputs.environment }}/terraform.tfstate"
+
+      - name: Terraform Validate
+        working-directory: terraform_asg
+        run: terraform validate
 
       - name: Terraform Plan
         working-directory: terraform_asg
-        if: ${{ github.event.inputs.action == 'plan' }}
         run: terraform plan -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
 
+      # Optional: Apply step (manual approval recommended)
       - name: Terraform Apply
-        if: ${{ github.event.inputs.action == 'apply' }}
+        if: github.event.inputs.environment == 'prod'
+        working-directory: terraform_asg
         run: terraform apply -auto-approve -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
