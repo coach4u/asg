@@ -1,8 +1,8 @@
 instance_names = [
   "linweb-a",
   "linweb-b",
-  "linapp-a",
-  "linapp-b"
+ # "linapp-a",
+ # "linapp-b"
 ]
 #instance_names=[]
 
@@ -12,6 +12,7 @@ subnet_id           = "subnet-0a8e29d155266bcba"
 security_group_id   = "sg-0353b4c9bbb1c84bb"
 key_name            = "keypair101"
 env                 = "dev"
+
 
 
 
