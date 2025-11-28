@@ -9,7 +9,8 @@ module "ec2" {
   env = var.env
 }
 
-output "instance_id" {
-  value = module.ec2.instance_id
+output "instance_ids" {
+  value = module.ec2.instance_ids
 }
+
 
