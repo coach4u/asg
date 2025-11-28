@@ -1,5 +1,6 @@
 module "ec2" {
   source            = "./module/ec2"
+  instance_names    = var.instance_names
   ami_id            = var.ami_id
   instance_type     = var.instance_type
   subnet_id         = var.subnet_id
@@ -11,3 +12,4 @@ module "ec2" {
 output "instance_id" {
   value = module.ec2.instance_id
 }
+
