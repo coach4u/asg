@@ -9,6 +9,15 @@ module "ec2" {
   env = var.env
 }
 
+module "launch_template" {
+  source = "./modules/launch_template"
+
+  env           = var.env
+  instance_type = var.instance_type
+  ami_id        = var.ami_id
+  key_name      = var.key_name
+}
+
 output "instance_ids" {
   value = module.ec2.instance_ids
 }
@@ -23,6 +32,7 @@ output "public_ips" {
 output "public_dns" {
   value = module.ec2.public_dns
 }
+
 
 
 
