@@ -4,17 +4,30 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy (e.g., dev, prod)'
+        description: "Environment to deploy (e.g., dev, prod)"
         required: true
-        default: 'dev'
+        default: "dev"
         type: choice
         options:
           - dev
           - prod
-      action:
-        description: 'Select Terraform Action'
+
+      module:
+        description: "Select which module to deploy"
         required: true
-        default: 'plan'
+        default: "all"
+        type: choice
+        options:
+          - all
+          - ec2
+          - launch_template
+          - asg
+          - alb
+
+      action:
+        description: "Select Terraform Action"
+        required: true
+        default: "plan"
         type: choice
         options:
           - plan
@@ -25,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup Terraform
@@ -42,7 +55,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: terraform_asg
-        run: terraform init -backend-config="key=ec2/${{ github.event.inputs.environment }}/terraform.tfstate"
+        run: terraform init -backend-config="key=${{ github.event.inputs.module }}/${{ github.event.inputs.environment }}/terraform.tfstate"
 
       - name: Terraform Validate
         working-directory: terraform_asg
@@ -51,9 +64,26 @@ jobs:
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
         working-directory: terraform_asg
-        run: terraform plan -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
+        run: |
+          if [ "${{ github.event.inputs.module }}" = "all" ]; then
+            terraform plan -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
+          else
+            terraform plan \
+              -target="module.${{ github.event.inputs.module }}" \
+              -var="env=${{ github.event.inputs.environment }}" \
+              -var-file="terraform.tfvars"
+          fi
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
         working-directory: terraform_asg
-        run: terraform apply -auto-approve -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
+        run: |
+          if [ "${{ github.event.inputs.module }}" = "all" ]; then
+            terraform apply -auto-approve -var="env=${{ github.event.inputs.environment }}" -var-file="terraform.tfvars"
+          else
+            terraform apply \
+              -target="module.${{ github.event.inputs.module }}" \
+              -auto-approve \
+              -var="env=${{ github.event.inputs.environment }}" \
+              -var-file="terraform.tfvars"
+          fi
