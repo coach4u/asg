@@ -10,7 +10,7 @@ module "ec2" {
 }
 
 module "launch_template" {
-  source = "./modules/launch_template"
+  source = "./module/launch_template"
 
   env           = var.env
   instance_type = var.instance_type
@@ -32,6 +32,7 @@ output "public_ips" {
 output "public_dns" {
   value = module.ec2.public_dns
 }
+
 
 
 
