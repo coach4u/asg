@@ -13,15 +13,16 @@ provider "aws" {
 module "launch_template" {
   source = "../../module/launch_template"
 
-  # module inputs (must match module/launch_template/variables.tf)
-  name               = var.name
-  ami_id             = var.ami_id
-  instance_type      = var.instance_type
+  name              = "${var.env}-launch-template"
+  instance_type     = var.instance_type
+  ami_id            = var.ami_id
   security_group_ids = var.security_group_ids
-  subnet_id          = var.subnet_id
-  user_data          = fileexists(var.user_data_file) && var.user_data_file != "" ? file(var.user_data_file) : ""
-  key_name           = var.key_name
+  subnet_id         = var.subnet_id
+  key_name          = var.key_name
+  user_data_file    = var.user_data_file
+  env               = var.env
 }
+
 
 output "launch_template_id" {
   value = module.launch_template.launch_template_id
