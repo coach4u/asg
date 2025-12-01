@@ -60,7 +60,7 @@ resource "aws_launch_template" "lt" {
     security_groups = var.security_group_ids
   }
 
-  user_data = base64encode(var.user_data)
+  user_data = var.user_data 
 
   tag_specifications {
     resource_type = "instance"
