@@ -31,3 +31,9 @@ variable "user_data_file" {
 variable "env" {
   type = string
 }
+
+variable "user_data" {
+  description = "Path to user data file or inline script"
+  type        = string
+  default     = ""
+}
