@@ -18,9 +18,10 @@ variable "subnet_id" {
   type = string
 }
 
-variable "user_data_file" {
-  type    = string
-  default = ""
+variable "user_data" {
+  description = "User data script content"
+  type        = string
+  default     = ""
 }
 
 variable "key_name" {
