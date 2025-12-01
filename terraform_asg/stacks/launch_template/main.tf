@@ -19,7 +19,7 @@ module "launch_template" {
   security_group_ids = var.security_group_ids
   subnet_id         = var.subnet_id
   key_name          = var.key_name
-  user_data_file    = var.user_data_file
+  user_data    = var.user_data_file
   env               = var.env
 }
 
