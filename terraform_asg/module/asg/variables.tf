@@ -26,3 +26,8 @@ variable "desired_capacity" {
 variable "subnet_ids" {
   type = list(string)
 }
+
+variable "alb_target_group_arn" {
+  description = "ARN of the ALB target group to attach the ASG"
+  type        = string
+}
