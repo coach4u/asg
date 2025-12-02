@@ -46,18 +46,18 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Init
-        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} init \
+        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} init \
               -backend-config="key=${{ github.event.inputs.stack }}/${{ github.event.inputs.environment }}/terraform.tfstate"
 
       - name: Terraform Validate
-        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} validate
+        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} validate
 
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
-        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} plan \
+        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} plan \
               -var-file=terraform.${{ github.event.inputs.environment }}.tfvars
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
-        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} apply \
+        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} apply \
               -auto-approve -var-file=terraform.${{ github.event.inputs.environment }}.tfvars
