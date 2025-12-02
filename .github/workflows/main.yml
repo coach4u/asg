@@ -6,17 +6,14 @@ on:
       stack:
         description: "Which stack to run"
         required: true
-        default: "launch_template"
         type: choice
         options:
-          - ec2
           - launch_template
           - asg
           - alb
       environment:
         description: "Environment"
         required: true
-        default: "dev"
         type: choice
         options:
           - dev
@@ -24,7 +21,6 @@ on:
       action:
         description: "Terraform action"
         required: true
-        default: "plan"
         type: choice
         options:
           - plan
@@ -50,15 +46,18 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Init
-        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} init -backend-config="key=${{ github.event.inputs.stack }}/${{ github.event.inputs.environment }}/terraform.tfstate"
+        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} init \
+              -backend-config="key=${{ github.event.inputs.stack }}/${{ github.event.inputs.environment }}/terraform.tfstate"
 
       - name: Terraform Validate
         run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} validate
 
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
-        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} plan -var-file=terraform.tfvars
+        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} plan \
+              -var-file=terraform.${{ github.event.inputs.environment }}.tfvars
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
-        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} apply -auto-approve -var-file=terraform.tfvars
+        run: terraform -chdir=terraform_asg/stacks/${{ github.event.inputs.stack }} apply \
+              -auto-approve -var-file=terraform.${{ github.event.inputs.environment }}.tfvars
