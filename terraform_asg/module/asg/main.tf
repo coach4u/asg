@@ -19,7 +19,7 @@ resource "aws_autoscaling_group" "asg" {
 
 # Attach ASG to ALB target group
 resource "aws_autoscaling_attachment" "asg_alb" {
-  autoscaling_group_name = aws_autoscaling_group.this.name
+  autoscaling_group_name = aws_autoscaling_group.asg.name
   alb_target_group_arn   = var.alb_target_group_arn
 }
 
