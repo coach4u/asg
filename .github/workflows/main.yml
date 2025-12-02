@@ -1,26 +1,20 @@
-name: Terraform Deployment
+name: Terraform ASG Deployment
 
 on:
   workflow_dispatch:
     inputs:
-      stack:
-        description: "Which stack to run"
-        required: true
-        type: choice
-        options:
-          - launch_template
-          - asg
-          - alb
       environment:
-        description: "Environment"
+        description: "Environment to deploy (dev/prod)"
         required: true
+        default: "dev"
         type: choice
         options:
           - dev
           - prod
       action:
-        description: "Terraform action"
+        description: "Terraform Action"
         required: true
+        default: "plan"
         type: choice
         options:
           - plan
@@ -29,35 +23,37 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.5
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
       - name: Terraform Init
-        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} init \
-              -backend-config="key=${{ github.event.inputs.stack }}/${{ github.event.inputs.environment }}/terraform.tfstate"
+        working-directory: terraform_asg
+        run: terraform init -backend-config="key=${{ github.event.inputs.environment }}/terraform.tfstate"
 
       - name: Terraform Validate
-        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} validate
+        working-directory: terraform_asg
+        run: terraform validate
 
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
-        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} plan \
-              -var-file=terraform.${{ github.event.inputs.environment }}.tfvars
+        working-directory: terraform_asg
+        run: terraform plan -var-file=terraform.tfvars
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
-        run: terraform -chdir=terraform_asg/module/${{ github.event.inputs.stack }} apply \
-              -auto-approve -var-file=terraform.${{ github.event.inputs.environment }}.tfvars
+        working-directory: terraform_asg
+        run: terraform apply -auto-approve -var-file=terraform.tfvars
