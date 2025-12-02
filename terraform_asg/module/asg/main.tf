@@ -16,3 +16,10 @@ resource "aws_autoscaling_group" "asg" {
     propagate_at_launch = true
   }
 }
+
+# Attach ASG to ALB target group
+resource "aws_autoscaling_attachment" "asg_alb" {
+  autoscaling_group_name = aws_autoscaling_group.this.name
+  alb_target_group_arn   = var.alb_target_group_arn
+}
+
